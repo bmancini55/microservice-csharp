@@ -9,26 +9,26 @@ using System.Threading.Tasks;
 
 namespace Framework.Core
 {
-    public class App
+    public class App : IDisposable
     {
         protected IConnection connection;
         protected IModel channel;
         protected string callbackQueueName;
         protected EventingBasicConsumer callbackConsumer;
         protected Dictionary<string, Action<string>> callbacks;
-        protected List<Tuple<string, Func<string, string>>> deferredHandlers;
-        protected List<Tuple<string, Func<string, string>>> deferredListeners;
+        protected List<Tuple<string, Func<string, Task<string>>>> deferredHandlers;
+        protected List<Tuple<string, Func<string, Task<string>>>> deferredListeners;
 
         public App()
         {
-            deferredHandlers = new List<Tuple<string, Func<string, string>>>();
-            deferredListeners = new List<Tuple<string, Func<string, string>>>();
+            deferredHandlers = new List<Tuple<string, Func<string, Task<string>>>>();
+            deferredListeners = new List<Tuple<string, Func<string, Task<string>>>>();
             callbacks = new Dictionary<string, Action<string>>();
         }
 
-        public void Start(string brokerPath) 
+        public void Start(string brokerPath, string username, string password) 
         {
-            var factory = new ConnectionFactory { HostName = brokerPath };
+            var factory = new ConnectionFactory { HostName = brokerPath, UserName = username, Password = password };
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
             Console.WriteLine("Connected to " + brokerPath);
@@ -40,7 +40,7 @@ namespace Framework.Core
             callbackConsumer.Received += (chan, msg) =>
             {
                 var correlationId = msg.BasicProperties.CorrelationId;
-                Console.WriteLine(" [x] completed " + correlationId);
+                Console.WriteLine(" [f] completed " + correlationId);
 
                 if (callbacks.ContainsKey(correlationId))
                 {
@@ -56,10 +56,25 @@ namespace Framework.Core
             Console.WriteLine("Service has successfully started");
         }
 
-        public void Handle(string eventName, Func<string, string> processMsg) 
+        public void Stop()
+        {
+            if (this.channel != null)
+            {
+                this.channel.Dispose();
+                this.channel = null;
+            }
+
+            if (this.connection != null)
+            {
+                this.connection.Dispose();
+                this.connection = null;
+            }
+        }
+
+        public void Handle(string eventName, Func<string, Task<string>> processMsg) 
         {
             if (channel == null)
-                deferredHandlers.Add(new Tuple<string, Func<string, string>>(eventName, processMsg));
+                deferredHandlers.Add(new Tuple<string, Func<string, Task<string>>>(eventName, processMsg));
             else
                 Handler(eventName, processMsg);
         }
@@ -90,20 +105,21 @@ namespace Framework.Core
         }
 
 
-        protected void Handler(string eventName, Func<string, string>  processMsg)
+        protected void Handler(string eventName, Func<string, Task<string>>  processMsg)
         {
             Console.WriteLine("Handling " + eventName);
 
             channel.ExchangeDeclare("app", "topic", true);
             channel.QueueDeclare(eventName, true, false, false, null);
             channel.QueueBind(eventName, "app", eventName);
+            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (chan, msg) => HandleMessage(eventName, msg, processMsg);
-            channel.BasicConsume(eventName, true, consumer);
+            channel.BasicConsume(queue: eventName, noAck: false, consumer: consumer);
         }
 
-        protected void HandleMessage(string eventName, BasicDeliverEventArgs msg, Func<string, string> processMsg)
+        protected async void HandleMessage(string eventName, BasicDeliverEventArgs msg, Func<string, Task<string>> processMsg)
         {
             var correlationId = msg.BasicProperties.CorrelationId;
             var replyTo = msg.BasicProperties.ReplyTo;
@@ -111,7 +127,7 @@ namespace Framework.Core
             Console.WriteLine(string.Format(" [f] handling {0} {1}", eventName, correlationId));
 
             var input = Encoding.UTF8.GetString(msg.Body);
-            var result = processMsg(input);
+            var result = await processMsg(input);
             var buffer = Encoding.UTF8.GetBytes(result);
             var properties = channel.CreateBasicProperties();
             properties.CorrelationId = correlationId;
@@ -120,8 +136,12 @@ namespace Framework.Core
                 channel.BasicPublish("", replyTo, properties, buffer);
 
             channel.BasicPublish("app", eventName + ".complete", properties, buffer);
+            channel.BasicAck(msg.DeliveryTag, false);
         }
 
-        
+        public void Dispose()
+        {
+            this.Stop();
+        }
     }
 }

@@ -37,21 +37,23 @@ namespace Framework.Examples
 
         static async Task Produce()
         {
-            var app = new App();
-            app.Start("localhost");
-            for (var i = 0; i < 10; i++)
-                await app.Publish("test", "test");
+            using (var app = new App())
+            {
+                app.Start("pgp187-bmanci01", "app", "app");
+                for (var i = 0; i < 10; i++)
+                    await app.Publish("test", "test");
+            }
         }
 
         static async Task Consume()
         {
             var app = new App();
-            app.Handle("test", (msg) =>
+            app.Handle("test", async (msg) =>
             {
-                Console.WriteLine(" [!] " + msg);
+                Console.WriteLine(" [o] received " + msg);
                 return "done";
             });
-            app.Start("localhost");
+            app.Start("pgp187-bmanci01", "app", "app");
         }
     }
 }

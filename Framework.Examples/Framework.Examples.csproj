@@ -7,8 +7,8 @@
     <ProjectGuid>{9E163FD5-2366-4F6B-A98D-971C192AC798}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RabbitMqFrameworkTest</RootNamespace>
-    <AssemblyName>RabbitMqFrameworkTest</AssemblyName>
+    <RootNamespace>Framework.Examples</RootNamespace>
+    <AssemblyName>Framework.Examples</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
