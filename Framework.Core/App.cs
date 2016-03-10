@@ -104,6 +104,28 @@ namespace Framework.Core
             return result;
         }
 
+        public void Broadcast(string eventName, string data, string correlationId = null)
+        {
+            if (correlationId == null)
+                correlationId = Guid.NewGuid().ToString();
+
+            Console.WriteLine(string.Format(" [f] broadcasting {0} {1}", eventName, correlationId));
+
+            channel.ExchangeDeclare("app", "topic", true);
+
+            var buffer = Encoding.UTF8.GetBytes(data);
+
+            //var tcs = new TaskCompletionSource<string>();
+            //var task = tcs.Task;
+            //callbacks[correlationId] = (string msg) => tcs.SetResult(msg);
+
+            var properties = channel.CreateBasicProperties();
+            properties.CorrelationId = correlationId;
+            //properties.ReplyTo = callbackQueueName;
+            channel.BasicPublish("app", eventName, properties, buffer);
+        }
+
+
 
         protected void Handler(string eventName, Func<string, Task<string>>  processMsg)
         {

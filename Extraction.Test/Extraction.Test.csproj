@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Framework.Core">
-      <HintPath>D:\TFS_Data\git\microservice-csharp\Framework.Core\bin\Debug\Framework.Core.dll</HintPath>
+      <HintPath>..\Framework.Core\bin\Debug\Framework.Core.dll</HintPath>
     </Reference>
     <Reference Include="RabbitMQ.Client">
       <HintPath>D:\TFS_Data\git\microservice-csharp\Framework.Core\bin\Debug\RabbitMQ.Client.dll</HintPath>
