@@ -34,7 +34,7 @@ namespace MicroService.TextAndConcept
             sw.Start();
             conceptExtractor.Process(text);
             sw.Stop();
-            app.Broadcast("log.cex", file + "|HandleConceptExtract|" + sw.ElapsedMilliseconds);
+            //app.Broadcast("log.cex", file + "|HandleConceptExtract|" + sw.ElapsedMilliseconds);
 
             return "ok";
         }
@@ -46,7 +46,7 @@ namespace MicroService.TextAndConcept
             sw.Start();
             var text = textExtractor.Process(fileBytes);
             sw.Stop();
-            app.Broadcast("log.cex", file + "|HandleTextExtract|" + sw.ElapsedMilliseconds);
+            //app.Broadcast("log.cex", file + "|HandleTextExtract|" + sw.ElapsedMilliseconds);
 
             return text;
         }
@@ -63,7 +63,7 @@ namespace MicroService.TextAndConcept
                 await fs.ReadAsync(buffer, 0, (int)length);
             }
             sw.Stop();
-            app.Broadcast("log.cex", file + "|fileSize|" + length + "|ReadFileText|" + sw.ElapsedMilliseconds);
+            //app.Broadcast("log.cex", file + "|fileSize|" + length + "|ReadFileText|" + sw.ElapsedMilliseconds);
 
             return buffer;
         }
