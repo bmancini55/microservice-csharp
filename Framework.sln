@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extraction.DtSearch", "Extr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extraction.Service", "Extraction.Service\Extraction.Service.csproj", "{80A9464C-176A-48AC-88F5-DFAFAD2683D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extraction.Test", "Extraction.Test\Extraction.Test.csproj", "{F26E3AF2-D557-42B3-B0DB-C47CD056D1CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{80A9464C-176A-48AC-88F5-DFAFAD2683D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80A9464C-176A-48AC-88F5-DFAFAD2683D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80A9464C-176A-48AC-88F5-DFAFAD2683D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F26E3AF2-D557-42B3-B0DB-C47CD056D1CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F26E3AF2-D557-42B3-B0DB-C47CD056D1CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F26E3AF2-D557-42B3-B0DB-C47CD056D1CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F26E3AF2-D557-42B3-B0DB-C47CD056D1CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
